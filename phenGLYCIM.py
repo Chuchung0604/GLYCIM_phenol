@@ -18,7 +18,7 @@ import HourWea
 
 
 class Development:
-    # Parameter of KH11 
+    # Parameter of KH9
     Parm2 = 0.0125 #slope of V stage
     Parm3 = 8 # max V stage
     Parm4 = 1 #effect of clay to early V stage
