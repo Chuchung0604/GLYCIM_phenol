@@ -1,0 +1,31 @@
+Abbr,TN10,KH9,KH11,Description
+Version,180729,181126,180729,date of latest modification
+MG,11,11,11,Maturity group
+SEEDLB,3780,2100,2100,number of seeds per pound weight
+FILL,13.1,10,3.1,seed fill rate at 24
+DET,1,1,1,0 for determinate 1 for inderteminate
+1,1,1,1,pennam equa.
+2,0.0125,0.0125,0.01,slope of Vstage
+3,17,8,8,max v stage
+4,1,1,1,early V and clay content
+5,0.087,0.087,0.09,progress rate to R0 before solstice    
+6,0.0262,0.0262,0.0272,progress rate ro R0 at solstice
+7,0.0212,0.0212,0.02,progress rate to R0 after solstice    
+8,0.24,0.24,0.24,rate R0 to R2                        
+9,0.7155,0.9656,0.955,slope of R2 end on the RDFRST
+10,63.582,40.068,42.068,intercept of R2 end on the RDFRST
+11,0.01,0.01,0.0125,rate R2 to R6                           
+12,230,190,200,"length of the plateau R5, dday          "
+13,300,280,450,"length of the plateau R6 with no stress, dday"
+14,1,1,1,"rate of the decay of the R6 plateau as the stress increases, dday"
+15,0.00334,0.00334,0.00334,"rate of the progress towards R7, dday-1"
+16,6,5,6.9,R stage to stop vegetative growth
+17,0.002,0.002,0.002,Potential elongation / dry weight increase of petioles
+18,1,1,0.8,Potential rate of the root weight increase
+19,51.785,0.8,2.785,Increase in pod weight / progress in R stages
+20,50.755,1,0.955,relates increase in seed weight and FILL --0.80
+21,5.3,8.5,8.6,a in relationship between height and V stages h=a*V^(b-1)
+22,1.28,0.8,1.08,b in relationship between height and V stages  
+23,0.3,0.5,0.3,Number of branches / plant density
+24,1.5,1,1.5,Stem weight / stem elongation                      
+25,1.8,1.8,1.81,Increment in leaf area / increment in vegetable stages   
