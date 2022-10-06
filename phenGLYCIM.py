@@ -8,18 +8,16 @@ Created on Thu Jun 20 14:32:40 2019
 import HourWea
 
 
-latitude = 22.4
-JDAY = 180
-WEA = HourWea.Radiation(latitude)
-DLNGMAX = WEA.DLNGMAX
-WEA.theory(JDAY)
-DAYLNG = WEA.DAYLNG
-DATE1 = "2022/02/03"
+# latitude = 22.4
+
+# WEA = HourWea.Radiation(latitude)
+# DLNGMAX = WEA.DLNGMAX
+# WEA.theory(JDAY)
+# DAYLNG = WEA.DAYLNG
+# DATE1 = "2022/02/03"
 
 
 class Development:
-    
-
     # Parameter of KH11 
     Parm2 = 0.0125 #slope of V stage
     Parm3 = 8 # max V stage
@@ -37,7 +35,7 @@ class Development:
     Parm15 = 0.00334 # rate to R7
     Parm16 = 5 #R stage stop V growth
     
-    def __init__(self,startday):
+    def __init__(self,lat,startday):
         # initialization 
         self.JDFRST = int(startday)
         self.DDAE = 0    # degree days after emergence
@@ -47,25 +45,36 @@ class Development:
         self.RSTAGE = -1
         self.IRFLAG1 = 0 #R1 
         self.IRFLAG4 = 0 #R4
-    
+        #latitude = 22.4
+        self.DAYLNG = 0
 
-        ILOW = 3
+        self.WEA = HourWea.Radiation(lat)
+        self. DLNGMAX = self.WEA.DLNGMAX
+        self.U5 = 0
+        self.DU6 = 0
+
+        #WEA.theory(JDAY)
+        #DAYLNG = WEA.DAYLNG
+        #DATE1 = "2022/02/03"
 
         # CALCULATE PROGRESS BETWEEN VSTAGES. DEGREE-DAYS, DAYS AFTER EMERGENCE, DEFICIT
-        #TAIRL=tempH
-        # DDAE = DDAE + TAIRL*PERIOD/24
-        # DAE = DAE + PERIOD/24
-    def update(self, dayTemp):
-        # should be called in hourly timestep
+
+    def update(self, jday,dayTemp):
+        # should be called in daily timestep
+        self.WEA.theory(jday)
+        self.DAYLNG = self.WEA.DAYLNG
+
+        # hourly time loop
         for tempH in dayTemp:
+            tempH = float(tempH)
             self.DDAE += tempH * self.dt
             self.DAE += self.dt
             self.updateVstage(tempH)
-            self.updateRstage(JDAY,tempH)
+            self.updateRstage(jday,tempH)
  
-            # progress in V stage
- 
+    # progress in V stage
     def updateVstage(self, hourT):
+        
         U0=4E+04 * self.Parm2 -255.0  # degree days to V1
         UMAX= U0 + self.Parm3 / self.Parm2
         VMAX= self.Parm3            
@@ -80,21 +89,20 @@ class Development:
             self.VSTAGE += DV
             DV = self.VSTAGE - VOLD
     
-    def updateRstage(self,doy, hourT):
+    def updateRstage(self,jday, hourT):
         # Calculate progress in R stage
         # Progress towards R0(FLORAL INDUCTION)
         DR2=self.JDFRST* self.Parm9 + self.Parm10 -self.JDFRST # R2 date
         DDU5= self.Parm12  #degree days of R5 plateau
-        DU6 = 0
         # ILOW = 3
         # NTOPLF = self.VSTAGE
         
         ROLD = self.RSTAGE
         if self.RSTAGE < 0:
-            if JDAY < 173:
-                DR = (self.Parm5 + self.Parm6*(DAYLNG-DLNGMAX)) * self.dt
+            if jday < 173:
+                DR = (self.Parm5 + self.Parm6*(self.DAYLNG-self.DLNGMAX)) * self.dt
             else:
-                DR = (self.Parm5 + self.Parm7*(DAYLNG-DLNGMAX)) * self.dt
+                DR = (self.Parm5 + self.Parm7*(self.DAYLNG-self.DLNGMAX)) * self.dt
             self.RSTAGE = self.RSTAGE + DR
         
             if self.RSTAGE >0:
@@ -121,44 +129,49 @@ class Development:
         elif self.RSTAGE < 5:
             DR = self.Parm11 * hourT * self.dt   
             self.RSTAGE +=  DR
-            # make the update R stage equal to R5 before finishing the R5 plateau
-            if self.RSTAGE > 5:
-               U5 = self.DDAE - ((self.RSTAGE-5)/DR) * hourT * self.dt  
-               self.RSTAGE = 5
-               if self.DDAE > self.DDAE + DDU5: # R5 plateau
-                   RSTAGE = 5 + (self.DDAE-U5-DDU5) * self.Parm11
+            # at find R4 date
             if self.RSTAGE >= 4 and self.IRFLAG4 == 0:
                 #R4DATE = DATE1
                 self.IRFLAG4 = 1
-                
+            # make the update R stage equal to R5 before finishing the R5 plateau
+            
+            if self.RSTAGE > 5:
+               U5 = self.DDAE - ((self.RSTAGE-5)/DR) * hourT * self.dt
+               self.U5 = U5
+               #print("U5=",round(U5), "RSTAGE=",round(self.RSTAGE,2))
+               self.RSTAGE = 5
+               if self.DDAE > self.DDAE + DDU5: # R5 plateau
+                   self.RSTAGE = 5 + (self.DDAE-U5-DDU5) * self.Parm11
+           
         #R5 plateau
         elif self.RSTAGE == 5:
-            if self.DDAE > U5 + DDU5:
-                self.RSTAGE = 5 + (self.DDAE-U5-DDU5) * self.Parm11
+
+            if self.DDAE > self.U5 + DDU5:
+                self.RSTAGE = 5 + (self.DDAE-self.U5-DDU5) * self.Parm11
         elif self.RSTAGE < 6:
            DR = self.Parm11 * hourT * self.dt
            self.RSTAGE += DR
            if self.RSTAGE > 6:
                U6 = self.DDAE - ((self.RSTAGE-6.0)/DR) * hourT * self.dt
                DDU6 = (self.DDAE-U6)/self.Parm13
-               DU6 += DDU6
+               self.DU6 += DDU6
                self.RSTAGE = 6
                if self.DU6 > 1.0:
-                   self.RSTAGE = 6.0 + self.Parm15 * hourT*(DU6-1.0)/DDU6
+                   self.RSTAGE = 6.0 + self.Parm15 * hourT*(self.DU6-1.0)/DDU6
         
         # R6 plateau
         elif self.RSTAGE == 6.0 :
             # PLATEAU R6
             DDU6 = hourT/min(self.Parm13, max(0.001,self.Parm13-self.Parm14)) * self.dt
-            DU6 += DDU6
-            if DU6 > 1.0 :
+            self.DU6 += DDU6
+            if self.DU6 > 1.0 :
                 # PARTIAL PROGRESS TOWARDS R7
-                self.RSTAGE = 6.0 + self.Parm15* hourT*(DU6-1.0)/DDU6
+                self.RSTAGE = 6.0 + self.Parm15* hourT*(self.DU6-1.0)/DDU6
                 
-        elif RSTAGE < 7.0 :
+        elif self.RSTAGE < 7.0 :
             #  PROGRESS TOWARDS R7
             DR= self.Parm15 * hourT * self.dt
-            RSTAGE += DR
+            self.RSTAGE += DR
               # # the original GLYCIM calculate the leaf drop by deficiency
               # ILOW = 3
               # J8 = NTOPLF-ILOW
@@ -174,9 +187,21 @@ class Development:
             #  PROGRESS TOWARDS R8
             #DROP = 1
             #self.RSTAG += DR8
-            if RSTAGE >= 8.0:
+            if self.RSTAGE >= 8.0:
                 MATURE = 1
    
 if __name__ == "__main__" : 
-    print("hello")
+    #print("hello")
+    tempLst=[]
+    for h in range(24):
+        tempLst.append(20)
+    Soybean = Development(22.1,22)
+    for doy in range(20,300):
+        Soybean.update(doy,tempLst)
+
+        #print(Soybean.RSTAGE)
+        print("JDAY=%d DAYLNG=%.2f"%(doy,Soybean.DAYLNG))
+        if Soybean.RSTAGE>8:
+            break
+    #print(Soybean.RSTAGE)
     
