@@ -4,7 +4,6 @@ Created on Thu Oct  6 16:17:13 2022
 
 @author: ccchen
 """
-
 from datetime import datetime
 import phenGLYCIM 
 import csv
@@ -14,7 +13,6 @@ import matplotlib.dates as mdates
 
 Stage = {1:"始花期", 2:"盛花期", 3:"始莢期", 4:"莢果完全發育", 
          5: "開始充實",6:"完全充實", 7:"開始成熟", 8:"完全成熟期"}
-
 
 latitude=24.0
 date0str = input("請輸入播種日期(yyyy-mm-dd):")
