@@ -16,7 +16,6 @@ Stage = {1:"始花期", 2:"盛花期", 3:"始莢期", 4:"莢果完全發育",
          5: "開始充實",6:"完全充實", 7:"開始成熟", 8:"完全成熟期"}
 
 
-
 latitude=24.0
 date0str = input("請輸入播種日期(yyyy-mm-dd):")
 startDate = datetime.strptime(date0str,"%Y-%m-%d")
@@ -30,9 +29,7 @@ pltVstage =[]
 pltRstage = []
 
 #呼叫Development 物件
-Soybean = phenGLYCIM.Development(24.1,JdayFirst)
-
-
+Soybean = phenGLYCIM.Development(latitude,JdayFirst)
 
 # print("播種日期 = ", date0)
 with open(filename, newline='') as csvfile:
@@ -64,29 +61,24 @@ with open(filename, newline='') as csvfile:
       else:
           Rname = Stage[math.floor(rstage)]
       #leaftip = int(maize.leafAppeared)
-      cumTemp = round(float(Soybean.DDAE))
+      cumTemp = round(float(Soybean.DDAE),0)
       
       #print(datestr, "V=",round(vstage,1),"R=",round(rstage,1))
-      print(datestr, Rname)
+      print(datestr, Rname, cumTemp)
       
       if Soybean.RSTAGE >= 8:
           break
-     
-
-      
+    
 #       # making plot
       pltdate.append(date)
       pltRstage.append(float(Soybean.RSTAGE))
       pltVstage.append(float(Soybean.VSTAGE))
       daycounter += 1
 
-
-
 #lable_corn =  ["Sowing","Germination","Sowing","Flowering","Silking"]
 plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%b%d'))
 plt.xlabel('Date')
 plt.ylabel('Stage')
-
 
 
 plt.scatter(pltdate,pltRstage, c=pltRstage)
