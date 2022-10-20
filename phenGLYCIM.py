@@ -22,9 +22,9 @@ class Development:
     Parm2 = 0.0125 #slope of V stage
     Parm3 = 8 # max V stage
     Parm4 = 1 #effect of clay to early V stage
-    Parm5 = 0.087 #progress to R0 before Solstice
-    Parm6 = 0.0262 #progress to R0 at Solstice
-    Parm7 = 0.0212 #progress to R0 after Solstice
+    Parm5 = 0.08 #progress to R0 before Solstice 0.087
+    Parm6 = 0.018#progress to R0 at Solstice    0.262
+    Parm7 = 0.017 #progress to R0 after Solstice  0.212
     Parm8 = 0.24 #R0 to R2
     Parm9 = 0.9656 #slope of R2 end on the RDFRST
     Parm10 = 40.068 #intercept R2 end on the RDFRST
