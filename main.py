@@ -11,7 +11,7 @@ import math
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-Stage = {1:"始花期", 2:"盛花期", 3:"始莢期", 4:"莢果完全發育", 
+Stage = {1:"開花期", 2:"開花期", 3:"始莢期", 4:"莢果完全發育", 
          5: "開始充實",6:"完全充實", 7:"開始成熟", 8:"完全成熟期"}
 
 latitude=24.0
